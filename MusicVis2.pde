@@ -16,16 +16,23 @@ int G = 255;
 int B = 255;
 int scale = 0;
 
+PShader shader1;
+
 void setup()
 {
   
-  size(800, 500);
+  size(800, 800, P2D);
+  background(0); // start black
   
   minim = new Minim(this);
   song = minim.loadFile("FutureBeats.mp3", 1024);
   song.loop();
   
   beat = new BeatDetect();
+  
+  shader1 = loadShader("zoom.glsl");
+  shader1.set("amtSpin", 0.001);
+  shader1.set("amtZoom", .999);
   
   int unit = 40;
   
@@ -47,11 +54,8 @@ void setup()
 }
 void draw()
 {
-  // Fades the background
   noStroke();
-  fill(0,0,0,30);
-  rect(0,0,width,height);
-  
+   
   // Sets the beat detect mode to the Frequency Energy of the song
   beat.detectMode(BeatDetect.FREQ_ENERGY);
   beat.detect(song.mix);
@@ -77,7 +81,8 @@ void draw()
   
   // Detects if there is a beat that has the same frequency as a snare drum
   //Gets a random number and uses that random number for the index in Points[]
-  // Sets the points color to Red and increases its size  
+  // Sets the points color to Red and increases its size
+  
   if(beat.isSnare())
   {
     int rand = (int)random(0, points.length);
@@ -102,6 +107,8 @@ void draw()
   }
   
   // Draws the Point to the screen and then resets it back to default
+  
+  filter(shader1);
   for(Point p : points)
   {
     p.draw();
